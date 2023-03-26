@@ -1,5 +1,5 @@
 import './App.css';
-import {createBrowserRouter,Router,RouterProvider} from 'react-router-dom'
+import {createBrowserRouter,RouterProvider} from 'react-router-dom'
 
 // import all components
 import Username from './components/Username';
@@ -46,7 +46,7 @@ const router= createBrowserRouter([
 function App() {
     return ( 
         <main>
-            <RouterProvider routes={router}></RouterProvider>
+            <RouterProvider router={router}></RouterProvider>
         </main>
     );
 }
