@@ -6,7 +6,7 @@ import {Toaster} from 'react-hot-toast';
 import { useFormik } from 'formik';
 import { resetPasswordValidate } from '../helper/validate';
 
-export default function Password() {
+export default function Reset() {
 
   //initial formik
   const formik = useFormik({
@@ -40,7 +40,7 @@ export default function Password() {
           {/* form */}
           <form action="" className="py-20" onSubmit={formik.handleSubmit}>
 
-            <div className="textbox flex flex-col items-center">
+            <div className="textbox flex flex-col items-center gap-6">
               <input type="password" name="" placeholder='New Password' id="" className={styles.textbox} {...formik.getFieldProps('password')} />
               <input type="password" name="" placeholder='Retype Password' id="" className={styles.textbox} {...formik.getFieldProps('confirm_password')} />
               <button type="submit" className={styles.btn}>Reset</button>
