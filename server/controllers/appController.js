@@ -159,9 +159,25 @@ export async function login(req, res) {
 }
 
 // GET: http://localhost:8082/api/user/example123
+// this was a call back function but change it to a async await using Chat GPT for better use
 export async function getUser(req, res) {
-    res.json('getUser route')
+    const {username} = req.params;
+
+    try {
+        if(!username) return res.status(400).send({error : "Invalid username"});
+
+        const user = await UserModel.findOne({username});
+        if(!user) return res.status(404).send({error : "Couldn't find the user"});
+
+        // remove password from the user
+        const {password, ...rest}= Object.assign({}, user.toJSON());
+
+        return res.status(200).send(rest);
+    } catch (error) {
+        return res.status(500).send({error : "Can't find user data"});
+    }
 }
+
 
 // PUT: http://localhost:8082/api/user/updateuse
 // @param{
@@ -173,7 +189,30 @@ export async function getUser(req, res) {
 //     "profile":""
 // }
 export async function updateUser(req, res) {
-    res.json('updateUser route')
+    try {
+        const id = req.query.id;
+
+        if (!id) {
+            return res.status(401).send({error:"User not found" });
+        }
+
+        const body = req.body;
+        const result = await UserModel.updateOne({_id:id}, body);
+
+        console.log(result, body, id);
+
+        // If nModified is equal to zero, 
+        // it means that no document was modified by the update operation
+        if (result.modifiedCount <= 0) {
+            return res.status(401).send({error:"Nothing to update" });
+        }
+
+        return res.status(200).send({message:"Record updated" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({error });
+    }
 }
 
 // GET: http://localhost:8082/api/generateOTP
