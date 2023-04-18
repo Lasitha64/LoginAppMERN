@@ -190,16 +190,15 @@ export async function getUser(req, res) {
 // }
 export async function updateUser(req, res) {
     try {
-        const id = req.query.id;
+        //const id = req.query.id;
+        const {userId} = req.user
 
-        if (!id) {
+        if (!userId) {
             return res.status(401).send({error:"User not found" });
         }
 
         const body = req.body;
-        const result = await UserModel.updateOne({_id:id}, body);
-
-        console.log(result, body, id);
+        const result = await UserModel.updateOne({_id:userId}, body);
 
         // If nModified is equal to zero, 
         // it means that no document was modified by the update operation
