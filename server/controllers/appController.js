@@ -2,6 +2,7 @@ import UserModel from "../model/User.mode.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import env from '../config.js';
+import otpGenerator from 'otp-generator';
 
 // middleware for verify user
 // If the user exists, the middleware function will call the next() function to allow the request to continue to the protected route.
@@ -216,22 +217,54 @@ export async function updateUser(req, res) {
 
 // GET: http://localhost:8082/api/generateOTP
 export async function generateOTP(req, res) {
-    res.json('generateOTP route')
+    res.app.locals.OTP = await otpGenerator.generate(6,{ digits: true, alphabets: false,lowerCaseAlphabets:false, upperCaseAlphabet:false,specialChars:false});
+    res.status(201).send({code : req.app.locals.OTP});
 }
 
 // GET: http://localhost:8082/api/verifyOTP
 export async function verifyOTP(req, res) {
-    res.json('verifyOTP route')
+    const {code} = req.query;
+    console.log(code, req.app.locals.OTP);
+    if(req.app.locals.OTP === code){
+        req.app.locals.OTP = null; // reset the OTP value
+        req.app.locals.resetSession = true; // start session for reset password
+        return res.status(201).send({msg : 'Verify successful'});
+    }
+    return res.status(400).send({error : "Invalid OTP"})
 }
 
 //successfully redirect user when OTP is valid
 // GET: http://localhost:8082/api/createResetSession
 export async function createResetSession(req, res) {
-    res.json('createResetSession route')
+    if(req.app.locals.resetSession){
+        req.app.locals.resetSession = false; // allow access to this route only once
+        return res.status(201).send({msg:"Access granted"})
+    }
+    return res.status(440).send({error:"Session expired"})
 }
 
 //update the password when we have a valid session
 // PUT: http://localhost:8082/api/resetPassword
 export async function resetPassword(req, res) {
-    res.json('resetPassword route')
+    try {
+
+        if(!req.app.locals.resetSession){
+            return res.status(440).send({ error: "Session Expired..!" });
+        }
+
+        const { username, password } = req.body;
+
+        const user = await UserModel.findOne({ username });
+        if (!user) {
+            return res.status(404).send({ error: "Username not found" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await UserModel.updateOne({ username: user.username }, { password: hashedPassword });
+
+        req.app.locals.resetSession = false;
+        return res.status(201).send({ msg: "Record Updated..!" });
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
+    }
 }
