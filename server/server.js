@@ -13,7 +13,7 @@ app.use(cors());
 app.use(morgan('tiny'));        // http logger
 app.disable('x-powered-by');    // less hackers know about stack
 
-const port = 8082;
+const port = 8080;
 
 // get request
 app.get('/', (req, res) =>{
@@ -27,7 +27,7 @@ app.use('/api',router)
 connect().then(() => {
     try {
         app.listen(port, () => {
-            console.log('Starting on http://localhost:8082');
+            console.log('Starting on http://localhost:8080');
         });
     } catch (error) {
         console.log('Cannot connect to the server')

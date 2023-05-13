@@ -16,7 +16,7 @@ export default function useFetch(query){
 
                 const {data, status} = await axios.get(`/api/${query}`);
 
-                if (status === 201) {
+                if (status === 200) {
                     setData(prev => ({...prev, isLoading:false}));
                     setData(prev => ({...prev, apiData: data, status: status}));
                 }
@@ -31,5 +31,5 @@ export default function useFetch(query){
         fetchData();
     },[query]);
 
-    return [getData, setData]
+    return [getData, setData];
 }
